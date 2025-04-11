@@ -1,0 +1,54 @@
+services:
+    whisper-nginx:
+        container_name: whisper-nginx
+        image: nginx:${NGINX_VERSION}
+        restart: unless-stopped
+        volumes:
+            - ./nginx/${VHOST_FILE}:/etc/nginx/conf.d/custom.conf
+        ports:
+            - "80"
+        depends_on:
+            - whisper-api
+        environment:
+            VIRTUAL_HOST: ${DOMAIN_HOST}
+            SELF_SIGNED_HOST: ${SELF_SIGNED_HOST}
+            VIRTUAL_PORT: 80
+            LETSENCRYPT_HOST: ${DOMAIN_HOST}
+            LETSENCRYPT_EMAIL: ${DOMAIN_EMAIL}
+        networks:
+            - nginx-proxy
+            - whisper-api
+
+    faster-whisper:
+        container_name: faster-whisper
+        image: lscr.io/linuxserver/faster-whisper:latest
+        restart: unless-stopped
+        environment:
+            - PUID=1000
+            - PGID=1000
+            - TZ=Etc/UTC
+            - WHISPER_MODEL=base
+        ports:
+            - ${FASTER_WHISPER_PORT}:${FASTER_WHISPER_PORT}
+        volumes:
+            - ./docker/faster-whisper:/config
+        networks:
+            - whisper-api
+
+    whisper-api:
+        build:
+            context: ./whisper-api
+        container_name: whisper-api
+        args:
+            WHISPER_API_PORT: ${WHISPER_API_PORT}
+        ports:
+            - ${WHISPER_API_PORT}:${WHISPER_API_PORT}
+        networks:
+            - whisper-api
+        restart: unless-stopped
+
+
+networks:
+    whisper-api:
+    nginx-proxy:
+        external: true

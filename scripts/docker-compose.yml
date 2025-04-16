@@ -19,28 +19,12 @@ services:
             - nginx-proxy
             - whisper-api
 
-    faster-whisper:
-        container_name: faster-whisper
-        image: lscr.io/linuxserver/faster-whisper:latest
-        restart: unless-stopped
-        environment:
-            - PUID=1000
-            - PGID=1000
-            - TZ=Etc/UTC
-            - WHISPER_MODEL=base
-        ports:
-            - ${FASTER_WHISPER_PORT}:${FASTER_WHISPER_PORT}
-        volumes:
-            - ./docker/faster-whisper:/config
-        networks:
-            - whisper-api
-
     whisper-api:
         build:
             context: ./whisper-api
+            args:
+                WHISPER_API_PORT: ${WHISPER_API_PORT}
         container_name: whisper-api
-        args:
-            WHISPER_API_PORT: ${WHISPER_API_PORT}
         ports:
             - ${WHISPER_API_PORT}:${WHISPER_API_PORT}
         networks:

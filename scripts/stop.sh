@@ -5,4 +5,4 @@ cd scripts || exit
 
 docker compose -p whisper down
 
-echo "*** Started ***"
+echo "*** Stopped ***"

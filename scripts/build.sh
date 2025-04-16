@@ -11,10 +11,8 @@ UPDATE_IMAGES=${UPDATE_IMAGES:-y}
 # Check user input in a POSIX-compatible way
 if [ "$UPDATE_IMAGES" = "y" ] || [ "$UPDATE_IMAGES" = "Y" ]; then
     NGINX_VERSION=$(grep -oP '^NGINX_VERSION=\K.*' .env)
-    WHISPER_VERSION=$(grep -oP '^WHISPER_VERSION=\K.*' .env)
 
     docker pull "nginx:$NGINX_VERSION"
-    docker pull "lscr.io/linuxserver/faster-whisper:$WHISPER_VERSION"
 fi
 
 echo "*** Rebuilding application ***"

@@ -6,6 +6,8 @@ from faster_whisper import WhisperModel
 import tempfile
 
 MODEL_DIR = os.environ.get("WHISPER_MODEL_DIR", "./")
+device = os.getenv("WHISPER_DEVICE", "cpu")
+compute_type = os.getenv("WHISPER_COMPUTE_TYPE", "int8")
 
 api_router = APIRouter()
 
@@ -20,12 +22,15 @@ app.add_middleware(
 )
 
 try:
-    model = WhisperModel("tiny.en", compute_type="int8_float16", device="cuda")
-    print("Loaded model with GPU acceleration")
+    model = WhisperModel("tiny.en", compute_type=compute_type, device=device)
+    print(f"Loaded model with {device} acceleration")
 except Exception as e:
-    print(f"Failed to load model with CUDA: {e}")
-    model = WhisperModel("tiny.en")
-    print("Loaded model on CPU")
+    if device == "cuda":
+        print(f"Failed to load model with CUDA: {e}")
+        model = WhisperModel("tiny.en", compute_type="int8", device="cpu")
+        print("Falling back to CPU mode")
+    else:
+        raise e
 
 # Transcription route
 @api_router.post("/transcribe")

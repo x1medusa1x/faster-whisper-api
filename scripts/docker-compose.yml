@@ -22,11 +22,7 @@ services:
     whisper-api:
         build:
             context: ./whisper-api
-            args:
-                WHISPER_API_PORT: ${WHISPER_API_PORT}
         container_name: whisper-api
-        ports:
-            - ${WHISPER_API_PORT}:${WHISPER_API_PORT}
         networks:
             - whisper-api
         restart: unless-stopped
